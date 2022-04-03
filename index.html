@@ -26,10 +26,17 @@
           </div>
         </v-app-bar>
         <v-container style="max-width: 800px" class="pt-10">
-          <p>＊ 文字数が長すぎて直接Gmailページが開けないので本文だけコピーしてください。</p>
-          <v-btn @click="copyBody">1. 本文コピー</v-btn>
-          <v-btn @click="toGmailPageWithoutBody"><v-icon>open-in-new</v-icon>2. Gmailへ</v-btn>
-          <v-textarea v-model="body" rows="30"></v-textarea>
+          <template v-if="isLoadingGmailPage">
+            <v-progress-circular indeterminate red></v-progress-circular> Gmailページを読み込み中
+          </template>
+          <template v-if="!isLoadingGmailPage">
+            <p>＊ 文字数が長すぎて直接Gmailページが開けないので本文だけコピーしてください。</p>
+            <v-btn @click="copyBody">1. 本文コピー</v-btn>
+            <v-btn @click="toGmailPageWithoutBody">
+              <v-icon>open-in-new</v-icon>2. Gmailへ
+            </v-btn>
+            <v-textarea v-model="body" rows="30"></v-textarea>
+          </template>
         </v-container>
       </v-main>
     </v-app>
@@ -54,6 +61,7 @@ TODO
           flashType: "success",
           flashIsShown: false,
           flashMessage: "",
+          isLoadingGmailPage: false,
         }
       },
       computed: {
@@ -94,6 +102,7 @@ TODO
         this.to = jsonObject.to
         this.$nextTick(()=>{
           if(this.gmailUrl.length < this.maxGmailLength){
+            this.isLoadingGmailPage = true
             location.href = this.gmailUrl
           }
         })
